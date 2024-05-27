@@ -5,9 +5,10 @@ DEBLOATED_PACKAGES_FILE="debloated_rom_packages"
 PACKAGES_TO_REMOVE_FILE="packages_to_remove"
 STOCK_PACKAGES_FILE="stock_rom_packages"
 REMOVE_SCRIPT="nuke.sh"
+PACKAGES_TO_REPLACE_FILE="packages_to_replace"
 
 # Clean up previous files
-rm -rf $REMOVE_SCRIPT $PACKAGES_TO_REMOVE_FILE
+rm -rf $REMOVE_SCRIPT $PACKAGES_TO_REMOVE_FILE $PACKAGES_TO_REPLACE_FILE
 
 # Get the list of installed packages from the stock phone
 if [ "$SPG" = "1" ]; then
@@ -58,6 +59,7 @@ EOF
 while IFS= read -r package_path; do
     if [[ -n "$package_path" ]]; then
         if [[ $package_path == /system/* ]]; then
+            echo "$package_path" >> $PACKAGES_TO_REPLACE_FILE
             cat << EOF >> $REMOVE_SCRIPT
 if [ -d /system_root/system ]; then
    rm -rf "/system_root$package_path"
@@ -66,12 +68,16 @@ else
 fi
 EOF
         else
+            echo "/system$package_path" >> $PACKAGES_TO_REPLACE_FILE
             echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
         fi
         echo "echo \"Removed $package_path\"" >> $REMOVE_SCRIPT
         echo "" >> $REMOVE_SCRIPT
     fi
+
 done < $PACKAGES_TO_REMOVE_FILE
+
+echo "$PACKAGES_TO_REPLACE_FILE has been generated."
 
 # Provide execution permission to the generated script
 chmod +x $REMOVE_SCRIPT
