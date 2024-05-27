@@ -5,8 +5,9 @@ DEBLOATED_PACKAGES_FILE="debloated_rom_packages"
 PACKAGES_TO_REMOVE_FILE="packages_to_remove"
 STOCK_PACKAGES_FILE="stock_rom_packages"
 REMOVE_SCRIPT="nuke.sh"
-rm -rf $REMOVE_SCRIPT
-rm -rf $PACKAGES_TO_REMOVE_FILE
+
+# Clean up previous files
+rm -rf $REMOVE_SCRIPT $PACKAGES_TO_REMOVE_FILE
 
 # Get the list of installed packages from the stock phone
 if [ "$SPG" = "1" ]; then
@@ -23,54 +24,52 @@ if [ ! -f "$DEBLOATED_PACKAGES_FILE" ] || [ ! -f "$STOCK_PACKAGES_FILE" ]; then
     exit 1
 fi
 
-# Generate the removal script
-echo "#!/system/bin/sh" > $REMOVE_SCRIPT
-echo "" >> $REMOVE_SCRIPT
+# Generate the removal script header
+cat << 'EOF' > $REMOVE_SCRIPT
+#!/system/bin/sh
 
-# Display warnings
-echo "echo 'WARNING: This script will remove packages from your device.'" >> $REMOVE_SCRIPT
-echo "echo '         I am not responsible for bricked devices.'" >> $REMOVE_SCRIPT
-echo "echo '         Ensure you have backed up your data.'" >> $REMOVE_SCRIPT
-echo "echo ' '" >> $REMOVE_SCRIPT
-echo "" >> $REMOVE_SCRIPT
-echo "echo 'YOU NEED TO BE ROOTED WITH MAGISK OR RUNNING IN TWRP'" >> $REMOVE_SCRIPT
-echo "echo ' '" >> $REMOVE_SCRIPT
-echo "" >> $REMOVE_SCRIPT
+echo 'WARNING: This script will remove packages from your device.'
+echo '         I am not responsible for bricked devices.'
+echo '         Ensure you have backed up your data.'
+echo ' '
+echo 'YOU NEED TO BE ROOTED WITH MAGISK OR RUNNING IN TWRP'
+echo ' '
 
-# Add Mounts
-echo "echo 'Mounting partitions as RW'" >> $REMOVE_SCRIPT
-echo "if [ -d /system_root/system ]; then" >> $REMOVE_SCRIPT
-echo "mount /system_root" >> $REMOVE_SCRIPT
-echo "mount /vendor" >> $REMOVE_SCRIPT
-echo "mount /product" >> $REMOVE_SCRIPT
-echo "mount /optics" >> $REMOVE_SCRIPT
-echo "mount /prism" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /system_root" >> $REMOVE_SCRIPT
-echo "else" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /" >> $REMOVE_SCRIPT
-echo "fi" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /product" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /prism" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /optics" >> $REMOVE_SCRIPT
-echo "mount -o remount,rw /vendor" >> $REMOVE_SCRIPT
-echo "echo ' '" >> $REMOVE_SCRIPT
-echo "" >> $REMOVE_SCRIPT
+echo 'Mounting partitions as RW'
+if [ -d /system_root/system ]; then
+mount /system_root
+mount /vendor
+mount /product
+mount /optics
+mount /prism
+mount -o remount,rw /system_root
+else
+mount -o remount,rw /
+fi
+mount -o remount,rw /product
+mount -o remount,rw /prism
+mount -o remount,rw /optics
+mount -o remount,rw /vendor
+echo ' '
+
+EOF
 
 # Add commands to remove packages to the script
-while IFS= read -r package_path
-do
-    if [[ ! -z "$package_path" ]]; then
+while IFS= read -r package_path; do
+    if [[ -n "$package_path" ]]; then
         if [[ $package_path == /system/* ]]; then
-            echo "if [ -d /system_root/system ]; then" >> $REMOVE_SCRIPT
-            echo "rm -rf \"/system_root$package_path\"" >> $REMOVE_SCRIPT
-            echo "else" >> $REMOVE_SCRIPT
-            echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
-            echo "fi" >> $REMOVE_SCRIPT
+            cat << EOF >> $REMOVE_SCRIPT
+if [ -d /system_root/system ]; then
+   rm -rf "/system_root$package_path"
+else
+   rm -rf "$package_path"
+fi
+EOF
         else
             echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
         fi
         echo "echo \"Removed $package_path\"" >> $REMOVE_SCRIPT
-        echo " " >> $REMOVE_SCRIPT
+        echo "" >> $REMOVE_SCRIPT
     fi
 done < $PACKAGES_TO_REMOVE_FILE
 
