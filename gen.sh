@@ -37,7 +37,7 @@ echo "" >> $REMOVE_SCRIPT
 # Add Mounts
 echo "echo 'Mounting as partitions RW'" >> $REMOVE_SCRIPT
 export remount='mount -o remount,rw'
-echo "$remount /system" >> $REMOVE_SCRIPT
+echo "$remount /" >> $REMOVE_SCRIPT
 echo "$remount /product" >> $REMOVE_SCRIPT
 echo "$remount /prism" >> $REMOVE_SCRIPT
 echo "$remount /optics" >> $REMOVE_SCRIPT
