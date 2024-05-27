@@ -6,6 +6,7 @@ PACKAGES_TO_REMOVE_FILE="packages_to_remove"
 STOCK_PACKAGES_FILE="stock_rom_packages"
 REMOVE_SCRIPT="nuke.sh"
 rm -rf $REMOVE_SCRIPT
+rm -rf $PACKAGES_TO_REMOVE_FILE
 
 # Get the list of installed packages from the stock phone
 if [ "$SPG" = "1" ]; then
@@ -30,8 +31,10 @@ echo "" >> $REMOVE_SCRIPT
 echo "echo 'WARNING: This script will remove packages from your device.'" >> $REMOVE_SCRIPT
 echo "echo '         I am not responsible for bricked devices.'" >> $REMOVE_SCRIPT
 echo "echo '         Ensure you have backed up your data.'" >> $REMOVE_SCRIPT
+echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
 echo "echo 'YOU NEED TO BE ROOTED WITH MAGISK'" >> $REMOVE_SCRIPT
+echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
 
 # Add Mounts
@@ -42,15 +45,15 @@ echo "$remount /product" >> $REMOVE_SCRIPT
 echo "$remount /prism" >> $REMOVE_SCRIPT
 echo "$remount /optics" >> $REMOVE_SCRIPT
 echo "$remount /vendor" >> $REMOVE_SCRIPT
+echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
-
 # Add commands to remove packages to the script
 while IFS= read -r package_path
 do
     if [[ ! -z "$package_path" ]]; then
         echo "echo \"Removing $package_path\"" >> $REMOVE_SCRIPT
         echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
-        echo "" >> $REMOVE_SCRIPT
+        echo " " >> $REMOVE_SCRIPT
     fi
 done < $PACKAGES_TO_REMOVE_FILE
 
