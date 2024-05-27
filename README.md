@@ -8,7 +8,7 @@ This script generates a removal script to clean unnecessary packages from your A
 - Use `SPG=1` to regenerate `stock_rom_packages` if needed.
 
 ### Prerequisites
-- Root access with Magisk.
+- Root access with Magisk or Have Custom recovery like TWRP.
 - A package list from a debloated ROM.
 - Backup your data before running the generated script.
 
@@ -31,7 +31,7 @@ This script generates a removal script to clean unnecessary packages from your A
     adb shell pm list packages -f | cut -f 2 -d ":" | cut -f 1 -d "=" > debloated_rom_packages
     ```
 
-4. **Transfer and execute `nuke.sh` in termux:**
+4. **Transfer and execute `nuke.sh` in termux or TWRP:**
     ```bash
     sh nuke.sh
     ```
