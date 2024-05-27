@@ -33,26 +33,43 @@ echo "echo '         I am not responsible for bricked devices.'" >> $REMOVE_SCRI
 echo "echo '         Ensure you have backed up your data.'" >> $REMOVE_SCRIPT
 echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
-echo "echo 'YOU NEED TO BE ROOTED WITH MAGISK'" >> $REMOVE_SCRIPT
+echo "echo 'YOU NEED TO BE ROOTED WITH MAGISK OR RUNNING IN TWRP'" >> $REMOVE_SCRIPT
 echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
 
 # Add Mounts
-echo "echo 'Mounting as partitions RW'" >> $REMOVE_SCRIPT
-export remount='mount -o remount,rw'
-echo "$remount /" >> $REMOVE_SCRIPT
-echo "$remount /product" >> $REMOVE_SCRIPT
-echo "$remount /prism" >> $REMOVE_SCRIPT
-echo "$remount /optics" >> $REMOVE_SCRIPT
-echo "$remount /vendor" >> $REMOVE_SCRIPT
+echo "echo 'Mounting partitions as RW'" >> $REMOVE_SCRIPT
+echo "if [ -d /system_root/system ]; then" >> $REMOVE_SCRIPT
+echo "mount /system_root" >> $REMOVE_SCRIPT
+echo "mount /vendor" >> $REMOVE_SCRIPT
+echo "mount /product" >> $REMOVE_SCRIPT
+echo "mount /optics" >> $REMOVE_SCRIPT
+echo "mount /prism" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /system_root" >> $REMOVE_SCRIPT
+echo "else" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /" >> $REMOVE_SCRIPT
+echo "fi" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /product" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /prism" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /optics" >> $REMOVE_SCRIPT
+echo "mount -o remount,rw /vendor" >> $REMOVE_SCRIPT
 echo "echo ' '" >> $REMOVE_SCRIPT
 echo "" >> $REMOVE_SCRIPT
+
 # Add commands to remove packages to the script
 while IFS= read -r package_path
 do
     if [[ ! -z "$package_path" ]]; then
-        echo "echo \"Removing $package_path\"" >> $REMOVE_SCRIPT
-        echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
+        if [[ $package_path == /system/* ]]; then
+            echo "if [ -d /system_root/system ]; then" >> $REMOVE_SCRIPT
+            echo "rm -rf \"/system_root$package_path\"" >> $REMOVE_SCRIPT
+            echo "else" >> $REMOVE_SCRIPT
+            echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
+            echo "fi" >> $REMOVE_SCRIPT
+        else
+            echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
+        fi
+        echo "echo \"Removed $package_path\"" >> $REMOVE_SCRIPT
         echo " " >> $REMOVE_SCRIPT
     fi
 done < $PACKAGES_TO_REMOVE_FILE
