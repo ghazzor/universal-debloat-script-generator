@@ -7,6 +7,31 @@ STOCK_PACKAGES_FILE="stock_rom_packages"
 REMOVE_SCRIPT="nuke.sh"
 PACKAGES_TO_REPLACE_FILE="packages_to_replace"
 
+# Source the blacklist definitions
+source blacklist.sh
+
+# Function to check if a package path is in the APK blacklist
+is_blacklisted_apk() {
+    local package_path=$1
+    for apk in "${BLACKLIST_APKS[@]}"; do
+        if [[ $package_path == *"$apk" ]]; then
+            return 0 # True, it is blacklisted
+        fi
+    done
+    return 1 # False, it is not blacklisted
+}
+
+# Function to check if a package path is in the directory blacklist
+is_blacklisted_dir() {
+    local package_path=$1
+    for dir in "${BLACKLIST_DIRS[@]}"; do
+        if [[ $package_path == $dir* ]]; then
+            return 0 # True, it is blacklisted
+        fi
+    done
+    return 1 # False, it is not blacklisted
+}
+
 # Clean up previous files
 rm -rf $REMOVE_SCRIPT $PACKAGES_TO_REMOVE_FILE $PACKAGES_TO_REPLACE_FILE
 
@@ -63,7 +88,7 @@ EOF
 
 # Add commands to remove packages to the script
 while IFS= read -r package_path; do
-    if [[ -n "$package_path" ]]; then
+    if [[ -n "$package_path" ]] && ! is_blacklisted_apk "$package_path" && ! is_blacklisted_dir "$package_path"; then
         if [[ $package_path == /system/* ]]; then
             echo "$package_path" >> $PACKAGES_TO_REPLACE_FILE
             echo "rm -rf \"\$systempath$package_path\"" >> $REMOVE_SCRIPT
