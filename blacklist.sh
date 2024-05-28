@@ -1,7 +1,7 @@
 # Blacklist specific APK names and directories
 BLACKLIST_APKS=(
-"SomeImportantApp.apk"
-"AnotherImportantApp.apk"
+"NetworkStackGoogle.apk"
+"NetworkStackGoogle-arm64_v8a.apk"
 ) # Add your blacklisted APK names here
 
 BLACKLIST_DIRS=(
