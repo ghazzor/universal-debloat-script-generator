@@ -81,20 +81,31 @@ fi
 EOF
 
 # Add commands to remove packages to the script
+echo 'packages_to_nuke=(' >> $REMOVE_SCRIPT
+
 while IFS= read -r package_path; do
     if [[ -n "$package_path" ]] && ! is_blacklisted_apk "$package_path" && ! is_blacklisted_dir "$package_path"; then
         if [[ $package_path == /system/* ]]; then
             echo "$package_path" >> $PACKAGES_TO_REPLACE_FILE
-            echo "rm -rf \"\$systempath$package_path\"" >> $REMOVE_SCRIPT
+            echo "\"\$systempath$package_path\"" >> $REMOVE_SCRIPT
         else
             echo "/system$package_path" >> $PACKAGES_TO_REPLACE_FILE
-            echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
+            echo "\"$package_path\"" >> $REMOVE_SCRIPT
         fi
-        echo "echo \"Removed $package_path\"" >> $REMOVE_SCRIPT
-        echo "" >> $REMOVE_SCRIPT
     fi
 
+
 done < $PACKAGES_TO_REMOVE_FILE
+
+echo ')' >> $REMOVE_SCRIPT
+cat << 'EOF' >> $REMOVE_SCRIPT
+
+for bloat in "${packages_to_nuke[@]}"; do
+    rm -rf "$bloat"
+    echo "Removed $bloat"
+done
+
+EOF
 
 echo "$PACKAGES_TO_REPLACE_FILE has been generated."
 
