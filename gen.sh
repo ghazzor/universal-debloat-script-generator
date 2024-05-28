@@ -63,11 +63,6 @@ echo ' '
 
 echo 'Mounting partitions as RW'
 if [ -d /system_root/system ]; then
-mount /system_root
-mount /vendor
-mount /product
-mount /optics
-mount /prism
 mount -o remount,rw /system_root
 else
 mount -o remount,rw /
@@ -75,7 +70,6 @@ fi
 mount -o remount,rw /product
 mount -o remount,rw /prism
 mount -o remount,rw /optics
-mount -o remount,rw /vendor
 echo ' '
 
 if [ -d /system_root/system ]; then
