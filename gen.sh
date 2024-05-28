@@ -53,6 +53,12 @@ mount -o remount,rw /optics
 mount -o remount,rw /vendor
 echo ' '
 
+if [ -d /system_root/system ]; then
+    systempath='/system_root'
+else
+    systempath=''
+fi
+
 EOF
 
 # Add commands to remove packages to the script
@@ -60,13 +66,7 @@ while IFS= read -r package_path; do
     if [[ -n "$package_path" ]]; then
         if [[ $package_path == /system/* ]]; then
             echo "$package_path" >> $PACKAGES_TO_REPLACE_FILE
-            cat << EOF >> $REMOVE_SCRIPT
-if [ -d /system_root/system ]; then
-   rm -rf "/system_root$package_path"
-else
-   rm -rf "$package_path"
-fi
-EOF
+            echo "rm -rf \"\$systempath$package_path\"" >> $REMOVE_SCRIPT
         else
             echo "/system$package_path" >> $PACKAGES_TO_REPLACE_FILE
             echo "rm -rf \"$package_path\"" >> $REMOVE_SCRIPT
