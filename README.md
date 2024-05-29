@@ -4,15 +4,15 @@ This script generates a removal script to clean unnecessary packages from your A
 
 ### Notice
 - You need to manually debloat once, then use this to create a debloat script.
-- Alternatively, manually edit `stock_rom_packages` to create `debloated_rom_packages`(refer step 3 for the adb command to dump list).
+- Alternatively, manually edit `stock_rom_packages` to create `debloated_rom_packages` (refer to step 3 for the adb command to dump the list).
 - Use `SPG=1` to regenerate `stock_rom_packages` if needed.
-- You might need to format `/data` to make the rom boot after debloating if you ran it in twrp
+- You might need to format `/data` to make the ROM boot after debloating if you ran it in TWRP.
 
 ### Prerequisites
-- Root access with Magisk or Have Custom recovery like TWRP.
+- Root access with Magisk or Custom recovery like TWRP.
 - A package list from a debloated ROM.
 - Backup your data before running the generated script.
-- Devices need to have `avb` disabled
+- Devices need to have `avb` disabled.
 
 ### Usage
 
@@ -21,25 +21,32 @@ This script generates a removal script to clean unnecessary packages from your A
     git clone https://github.com/ghazzor/universal-debloat-script-generator.git
     ```
 
-2. **Run the script on your local machine:**
+2. **Populate `debloated_rom_packages`:**
+
+    If not already done, create this file containing the package list from a debloated ROM:
+    ```bash
+    adb shell pm list packages -f | cut -f 2 -d ":" | cut -f 1 -d "=" > debloated_rom_packages
+    ```
+
+3. **Run the script on your local machine:**
     ```bash
     SPG=1 ./gen.sh
     ```
     This assumes your phone is on the stock ROM with all the bloat. `SPG=1` ensures the script populates `stock_rom_packages` using **ADB**.
 
-3. **Populate `debloated_rom_packages`:**
-    If not already done, create this file containing the package list from a debloated ROM:
-    ```bash
-    adb shell pm list packages -f | cut -f 2 -d ":" | cut -f 1 -d "=" > debloated_rom_packages
-    ```
 4. **Edit `blacklist.sh`:**
-    You can add **apks** and **dirs** that are to be ignored, by default it blacklists `/apex`, `/data` and `/vendor`.
 
-5. **Transfer and execute `nuke.sh` in termux or TWRP:**
-    ```bash
-    sh nuke.sh
-    ```
-   You need to mount partitions in twrp manually if you are running the script directly or let a flashable zip handle the mounting
+    You can add **APKs** and **directories** that are to be ignored and run gen.sh again. By default, it blacklists `/apex`, `/data`, and `/vendor`.
+
+6. **Flash the ZIP in TWRP/Execute nuke.sh in TERMUX:**
+
+    After running `gen.sh`, a TWRP flashable ZIP will be generated in the `package` directory and `nuke.sh` in repo dir
+
+    Transfer the generated ZIP to your device and flash it in TWRP. This will automatically handle mounting and removing the packages.
+    
+    **OR**
+
+    Execute nuke.sh in Termux
 
 ### Warnings
 - This script will remove packages from your device. The author is not responsible for any damage.
