@@ -113,9 +113,9 @@ cat << 'EOF' >> $REMOVE_SCRIPT
 for bloat in "${packages_to_nuke[@]}"; do
     if [ -e "$bloat" ]; then
         rm -rf "$bloat"
-        ui_print "Removed $bloat"
+        echo "Removed $bloat"
     else
-        ui_print "Skipping $bloat (NOT FOUND)"
+        echo "Skipping $bloat (NOT FOUND)"
     fi
 done
 
