@@ -1,1 +1,2 @@
-nuke.sh
+*.zip
+nuke*.sh
