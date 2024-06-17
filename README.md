@@ -7,12 +7,14 @@ This script generates a removal script to clean unnecessary packages from your A
 - Alternatively, manually edit `stock_rom_packages` to create `debloated_rom_packages` (refer to step 3 for the adb command to dump the list).
 - Use `SPG=1` to regenerate `stock_rom_packages` if needed.
 - You might need to format `/data` to make the ROM boot after debloating if you ran it in TWRP.
+- If your stock has uses erofs or any read-only fs, just use the list from `packages_to_replace` in a module to systemlessly debloat (module generation coming soon™).
 
 ### Prerequisites
 - Root access with Magisk or Custom recovery like TWRP.
 - A package list from a debloated ROM.
 - Backup your data before running the generated script.
 - Devices need to have `avb` disabled.
+- Basic knowledge of bash and Android.
 
 ### Usage
 
@@ -36,17 +38,17 @@ This script generates a removal script to clean unnecessary packages from your A
 
 4. **Edit `blacklist.sh`:**
 
-    You can add **APKs** and **directories** that are to be ignored and run gen.sh again. By default, it blacklists `/apex`, `/data`, and `/vendor`.
+    You can add **APKs** and **directories** that are to be ignored and run `gen.sh` again. By default, it blacklists `/apex`, `/data`, and `/vendor`.
 
-6. **Flash the ZIP in TWRP/Execute nuke.sh in TERMUX:**
+5. **Flash the ZIP in TWRP/Execute nuke.sh in TERMUX:**
 
-    After running `gen.sh`, a TWRP flashable ZIP will be generated in the `package` directory and `nuke.sh` in repo dir
+    After running `gen.sh`, a TWRP flashable ZIP will be generated in the `package` directory and `nuke.sh` in the repo directory.
 
     Transfer the generated ZIP to your device and flash it in TWRP. This will automatically handle mounting and removing the packages.
     
     **OR**
 
-    Execute nuke.sh in Termux
+    Execute `nuke.sh` in Termux.
 
 ### Warnings
 - This script will remove packages from your device. The author is not responsible for any damage.
